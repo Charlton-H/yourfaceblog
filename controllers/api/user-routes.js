@@ -43,6 +43,35 @@ router.post('/', (req, res) => {
     });
 });
 
+router.post('/login', (req, res) => {
+  // this route uses endpoint /login which is prefixed with /api/users already
+  // using the User model and sequelize's findOne method
+  // we are attempting to locate User record where email input, from request, matches
+  User.findOne({
+    where: { email: req.body.email },
+  }).then((dbUserData) => {
+    // result of the query is passed as dbUserData and if null, resolve with message that email was not found
+    if (!dbUserData) {
+      res.status(400).json({ message: 'No user with that email address!' });
+      return;
+    }
+    // res.json({ user: dbUserData });
+
+    // using dbUserData and the created method within User model class, we are comparing if password matches
+    // using bcrypt's compareSync method
+    // then assigning that boolean to validPassword
+    const validPassword = dbUserData.checkPassword(req.body.password);
+
+    // if validPassword not true, resolve message that password is incorrect
+    if (!validPassword) {
+      res.status(400).json({ message: 'Incorrect Password!' });
+      return;
+    }
+    // if validPassword is true, that password was accepted by sending resolve message user is now logged in
+    res.json({ user: dbUserData, message: 'You are now logged in!' });
+  });
+});
+
 router.put('/', (req, res) => {
   User.update(req.body, {
     individualHooks: true,
