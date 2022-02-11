@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Post, Vote } = require('../../models');
 
 router.get('/', (req, res) => {
   User.findAll({
@@ -12,10 +12,22 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/', (req, res) => {
+router.get('/:id', (req, res) => {
   User.findOne({
     attributes: { exclude: ['password'] },
     where: { id: req.params.id },
+    include: [
+      {
+        model: Post,
+        attributes: ['id', 'title', 'post_url', 'created_at'],
+      },
+      {
+        model: Post,
+        attributes: ['title'],
+        through: Vote,
+        as: 'voted_posts',
+      },
+    ],
   })
     .then((dbUserData) => {
       if (!dbUserData) {
@@ -72,7 +84,7 @@ router.post('/login', (req, res) => {
   });
 });
 
-router.put('/', (req, res) => {
+router.put('/:id', (req, res) => {
   User.update(req.body, {
     individualHooks: true,
     where: { id: req.params.id },
@@ -90,7 +102,7 @@ router.put('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
+router.delete('/:id', (req, res) => {
   User.destroy({ where: { id: req.params.id } })
     .then((dbUserData) => {
       if (!dbUserData) {
