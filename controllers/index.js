@@ -1,8 +1,10 @@
 // this file collects the packaged group of API endpoints and prefixes them with the path /api
 
 const router = require('express').Router();
-
 const apiRoutes = require('./api');
+const homeRoutes = require('./home-routes');
+
+router.use('/', homeRoutes);
 
 // api endpoint files
 router.use('/api', apiRoutes);
