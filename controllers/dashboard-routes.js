@@ -1,9 +1,14 @@
 const router = require('express').Router();
 const sequelize = require('../config/connection');
 const { Post, User, Comment } = require('../models');
+const withAuth = require('../utils/auth');
 
-router.get('/', (req, res) => {
+router.get('/', withAuth, (req, res) => {
   Post.findAll({
+    where: {
+      // use the ID from the session
+      user_id: req.session.user_id,
+    },
     attributes: [
       'id',
       'post_url',
@@ -32,20 +37,9 @@ router.get('/', (req, res) => {
     ],
   })
     .then((dbPostData) => {
-      /* This will loop over and map each Sequelize object into a serialized version of itself,
-       saving the results in a new posts array. Now we can plug that array into the template. 
-       However, even though the render() method can accept an array instead of an object, 
-       that would prevent us from adding other properties to the template later on.
-       To avoid future headaches, we can simply add the array to an obaject and 
-       continue passing an object to the template */
+      // serialize data before passing to template
       const posts = dbPostData.map((post) => post.get({ plain: true }));
-
-      // res.render passes this object to homepage.handlebars
-      // pass a single post object into the homepage template
-      res.render('homepage', {
-        posts,
-        loggedIn: req.session.loggedIn,
-      });
+      res.render('dashboard', { posts, loggedIn: true });
     })
     .catch((err) => {
       console.log(err);
@@ -53,16 +47,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/login', (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/');
-    return;
-  }
-
-  res.render('login');
-});
-
-router.get('/post/:id', (req, res) => {
+router.get('/post/:id', withAuth, (req, res) => {
   Post.findOne({
     where: {
       id: req.params.id,
@@ -104,7 +89,7 @@ router.get('/post/:id', (req, res) => {
       const post = dbPostData.get({ plain: true });
 
       // pass data to template
-      res.render('single-post', {
+      res.render('edit-post', {
         post,
         loggedIn: req.session.loggedIn,
       });
