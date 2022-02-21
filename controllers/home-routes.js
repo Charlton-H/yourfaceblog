@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const sequelize = require('../config/connection');
+const { Post, User, Comment } = require('../models');
 
 router.get('/', (req, res) => {
   Post.findAll({
@@ -30,6 +32,14 @@ router.get('/', (req, res) => {
     ],
   })
     .then((dbPostData) => {
+      /* This will loop over and map each Sequelize object into a serialized version of itself,
+       saving the results in a new posts array. Now we can plug that array into the template. 
+       However, even though the render() method can accept an array instead of an object, 
+       that would prevent us from adding other properties to the template later on.
+       To avoid future headaches, we can simply add the array to an object and 
+       continue passing an object to the template*/
+      const posts = dbPostData.map((post) => post.get({ plain: true }));
+
       // res.render passes this object to homepage.handlebars
       // pass a single post object into the homepage template
       res.render('homepage', {
