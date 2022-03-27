@@ -11,8 +11,8 @@ class Post extends Model {
         where: { id: body.post_id },
         attributes: [
           'id',
-          'post_url',
           'title',
+          'blog_text',
           'created_at',
           [
             sequelize.literal(
@@ -38,12 +38,9 @@ Post.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    post_url: {
-      type: DataTypes.STRING,
+    blog_text: {
+      type: DataTypes.TEXT('long'),
       allowNull: false,
-      validate: {
-        isURL: true,
-      },
     },
     user_id: {
       type: DataTypes.INTEGER,
