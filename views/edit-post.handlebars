@@ -5,10 +5,12 @@
   </h2>
   <form class="edit-post-form">
     <div>
+      <label>Post Title:</label> 
       <input name="post-title" type="text" value="{{post.title}}" />
     </div>
     <div >
-      <p>{{post.blog_text}}</p>
+      <label> Body:</label>
+       <textarea name="blog_text" maxlength="65535">{{post.blog_text}}</textarea>
     </div>
     <div>
       {{post.vote_count}} {{format_plural "point" post.vote_count}} by you on {{format_date post.created_at}}
