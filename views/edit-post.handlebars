@@ -6,7 +6,9 @@
   <form class="edit-post-form">
     <div>
       <input name="post-title" type="text" value="{{post.title}}" />
-      <span>({{format_url post.post_url}})</span>
+    </div>
+    <div >
+      <p>{{post.blog_text}}</p>
     </div>
     <div>
       {{post.vote_count}} {{format_plural "point" post.vote_count}} by you on {{format_date post.created_at}}
@@ -17,7 +19,7 @@
     <button type="button" class="delete-post-btn">Delete post</button>
   </form>
 </article>
-4
+
 <form class="comment-form">
   <div>
     <textarea name="comment-body"></textarea>
